@@ -35,3 +35,8 @@ jobs:
         name: goapp-bin
         path: ./goapp
 
+    - name: Build the Docker image
+      run: |
+        docker build . --file ln.dockerfile --tag goapp:$(date +%s)
+        echo "image=goapp:$(date +%s)" >> $GITHUB_OUTPUT
+
