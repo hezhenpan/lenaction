@@ -22,7 +22,8 @@ jobs:
     - name: Build release
       run: GOOS=linux GOARCH=amd64 go build -v ./...
 
-    - uses: actions/upload-artifact@v3
+    - name: Generate release
+      uses: actions/upload-artifact@v3
       with:
         name: outputfile
         path: ./lenaction
