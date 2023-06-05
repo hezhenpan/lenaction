@@ -26,12 +26,12 @@ jobs:
       with:
         go-version: "1.20"
 
-    - name: Build release
-      run: GOOS=linux GOARCH=amd64 go build -v ./...
+    - name: Build Go Binary File
+      run: GOOS=linux GOARCH=amd64 go build -o goapp -v ./...
 
-    - name: Generate release
+    - name: Release Go Binary File For Download
       uses: actions/upload-artifact@v3
       with:
-        name: outputfile
-        path: ./lenaction
+        name: goapp-bin
+        path: ./goapp
 
