@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Build and auto release
+name: Build image and Deploy to Amazon ECS
 
 on:
   # 手动触发事件
@@ -13,6 +13,21 @@ on:
 #        default: 'warning'
 #      tags:
 #        description: 'Test some tags'
+
+
+env:
+  AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: 811894424318.dkr.ecr.us-east-1.amazonaws.com/awsaction           # set this to your Amazon ECR repository name
+  ECS_SERVICE: awsome-service                 # set this to your Amazon ECS service name
+  ECS_CLUSTER: awsaction-cluster                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: ./task-define.json # set this to the path to your Amazon ECS task definition
+  # file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: awsome-server           # set this to the name of the container in the
+  # containerDefinitions section of your task definition
+
+permissions:
+  contents: read
+
 
 jobs:
 
@@ -46,8 +61,45 @@ jobs:
         name: goapp-bin
         path: ./maincode/goapp
 
-    - name: Build the Docker image
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        cd ./maincode && docker build . --file ln.dockerfile --tag goapp:$(date +%s)
-        echo "image=goapp:$(date +%s)" >> $GITHUB_OUTPUT
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker build --file ln.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      working-directory: ./maincode
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+      working-directory: ./maincode
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
 
