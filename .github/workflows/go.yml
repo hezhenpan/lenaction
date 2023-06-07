@@ -48,6 +48,6 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        docker build . --file ./maincode/ln.dockerfile --tag goapp:$(date +%s)
+        cd ./maincode && docker build . --file ln.dockerfile --tag goapp:$(date +%s)
         echo "image=goapp:$(date +%s)" >> $GITHUB_OUTPUT
 
