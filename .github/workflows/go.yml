@@ -17,7 +17,7 @@ on:
 
 env:
   AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: 811894424318.dkr.ecr.us-east-1.amazonaws.com/awsaction           # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: awsaction           # set this to your Amazon ECR repository name
   ECS_SERVICE: awsome-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: awsaction-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ./maincode/task-define.json # set this to the path to your Amazon ECS task definition
