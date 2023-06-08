@@ -83,6 +83,7 @@ jobs:
         # be deployed to ECS.
         docker build --file ln.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
       working-directory: ./maincode
 
     - name: Fill in the new image ID in the Amazon ECS task definition
