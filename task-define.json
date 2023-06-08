@@ -1,15 +1,15 @@
 {
-  "family": "my-awsome-task",
+  "family": "first-run-task-definition",
   "containerDefinitions": [
     {
-      "name": "awsome-server",
-      "image": "811894424318.dkr.ecr.us-east-1.amazonaws.com/awsaction:0.0.1",
+      "name": "go-proj-server",
+      "image": "811894424318.dkr.ecr.us-east-1.amazonaws.com/awsaction:a7b7a3c11a8557827544a4e2b7fb2dc355f31bec",
       "cpu": 256,
       "memoryReservation": 512,
       "links": [],
       "portMappings": [],
       "essential": true,
-      "entryPoint": [ ],
+      "entryPoint": [],
       "command": [],
       "environment": [],
       "mountPoints": [],
@@ -17,7 +17,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/my-awsome-task",
+          "awslogs-group": "/ecs/first-run-task-definition",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
